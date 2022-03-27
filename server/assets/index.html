@@ -1,0 +1,103 @@
+<html>  
+    <head>
+        <meta charset="utf-8"/>
+        <script src="wasm_exec.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/jsoneditor@9.7.4/dist/jsoneditor.min.css" rel="stylesheet" type="text/css">
+        <script src="https://cdn.jsdelivr.net/npm/jsoneditor@9.7.4/dist/jsoneditor.min.js"></script>
+    </head>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: row;
+            height: 100%;
+            width: 100%;
+            gap: 5px;
+        }
+        .jsonArea {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            gap: 5px;
+        }
+        #inputJson, #outputJson{
+            height: 100%;
+            width: 100%;
+        }
+        input {
+            padding: 5px;
+            border-width: 1px;
+            border-color: #CCCCCC;
+            color: #333;
+            border-style: solid;
+            border-radius: 5px;
+            box-shadow: 1px 1px 0px rgba(66,66,66,.2);
+
+        }
+        input:focus {
+            outline:none;
+        }
+
+        button {
+            box-shadow: 1px 1px 0px 0px #276873;
+            background-color:#3882fa;
+            border-radius:5px;
+            border:1px solid #29668f;
+            display:inline-block;
+            cursor:pointer;
+            color:#ffffff;
+            font-family:Arial;
+            padding:5px 10px;
+            text-decoration:none;
+        }
+        button:hover {
+            background-color:#408c99;
+        }
+        button:active {
+            position:relative;
+            top:1px;
+        }
+        .qtdArea{
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+    <body>
+        <div class="container">
+            <div class="jsonArea">
+                <div id="inputJson"></div>
+                <div class="qtdArea">
+                    <input style="flex:8;" value="1" type="number" id="qtd">
+                    <button style="flex:2;" onclick="Generate()">Gerar</button>
+                </div>
+            </div>
+            <div class="jsonArea">
+                <div id="outputJson"></div>
+            </div>
+        </div>
+    </body>
+    <script>
+        const go = new Go();
+        WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
+            go.run(result.instance);
+        });
+
+        function Generate(){
+            var data = inputJson.get()
+            var qtd = parseInt(document.getElementById("qtd").value);
+            result = GOGenerate(JSON.stringify(data),qtd);
+            outputJson.set(JSON.parse(result))
+
+        }
+
+        const inputJson = new JSONEditor(document.getElementById("inputJson"), {mode:'code'})
+        const outputJson = new JSONEditor(document.getElementById("outputJson"), {mode:'view'})
+        var start = {
+		"nome":"name:m",
+		"id":"number:10:25",
+		"cidade":"choise:Ouro Branco:Ouro Preto:Belo Horizonte",
+		"produtos":"choiseAny:r:Bala:Sorvete:Ovo:Arroz:Batata:Chocolate",
+		}
+        inputJson.set(start)
+
+    </script>
+</html>
